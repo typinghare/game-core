@@ -4,22 +4,26 @@ import { FrameUpdatable } from '../game'
 import { CallbackNode } from '../methodical'
 
 /**
- * Loop manager.
+ * Frame-based Loop manager.
  */
-export class LoopManager implements FrameUpdatable {
+export class FrameBasedLoopManager implements FrameUpdatable {
     /**
      * A set of frame-based loops.
      * @private
      */
     private readonly frameBasedLoopSet: Set<FrameBasedLoop> = new Set()
 
+    /**
+     * A set of frame-based loops that are going to be deleted in the next update.
+     * @private
+     */
     private readonly basedLoopToBeDeletedSet: Set<FrameBasedLoop> = new Set()
 
     /**
      * Returns a loop registrar.
      */
-    public getRegistrar(): LoopRegistrar {
-        return new LoopRegistrar(this)
+    public getRegistrar(): FrameBasedLoopRegistrar {
+        return new FrameBasedLoopRegistrar(this)
     }
 
     /**
@@ -56,11 +60,11 @@ export class LoopManager implements FrameUpdatable {
 }
 
 /**
- * Loop registrar.
+ * Frame-based Loop registrar.
  */
-export class LoopRegistrar {
+export class FrameBasedLoopRegistrar {
     public constructor(
-        private loopManager: LoopManager,
+        private loopManager: FrameBasedLoopManager,
     ) {
     }
 

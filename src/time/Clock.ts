@@ -1,4 +1,5 @@
 import { TimeUtil } from './TimeUtil'
+import { float } from '../types'
 
 /**
  * Game clock.
@@ -13,7 +14,13 @@ export class Clock {
      * Previous ticking timestamp.
      * @private
      */
-    private expectedNextTime: number = 0
+    private previousTime: number = 0
+
+    /**
+     * Previous delay milliseconds.
+     * @private
+     */
+    private previousDelayMs: number = 0
 
     /**
      * Timeout handler.
@@ -27,7 +34,7 @@ export class Clock {
      * @param fps Frame per seconds.
      */
     public constructor(
-        private readonly callback: () => void,
+        private readonly callback: ClockCallback,
         private fps: number = 30,
     ) {
         this.startTime = TimeUtil.now()
@@ -37,9 +44,7 @@ export class Clock {
      * Makes this clock run. The callback will be called immediately.
      */
     public run(): void {
-        this.callback()
-
-        this.expectedNextTime = TimeUtil.now()
+        this.previousTime = TimeUtil.now()
         this.autoSetTimeoutHandler()
     }
 
@@ -49,12 +54,19 @@ export class Clock {
 
     private getTimeout(delayMs: number = 1000 / this.fps): NodeJS.Timeout {
         // Simple frame stabilization algorithm
-        const realDelayMs: number = delayMs - (TimeUtil.now() - this.expectedNextTime)
-        this.expectedNextTime = TimeUtil.now() + delayMs
+        const deltaTime: float = TimeUtil.now() - this.previousTime
+        const realDelayMs: number = delayMs - (deltaTime - this.previousDelayMs)
+        this.previousTime = TimeUtil.now()
+        this.previousDelayMs = delayMs
 
         return setTimeout(() => {
-            this.callback()
+            this.callback(deltaTime)
             this.autoSetTimeoutHandler()
         }, realDelayMs)
     }
 }
+
+/**
+ * Clock callback.
+ */
+export type ClockCallback = (deltaTime: float) => void
