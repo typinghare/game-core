@@ -30,6 +30,14 @@ export class CallbackNode {
 
 export class CallbackQueue {
     /**
+     * Creates a callback queue and starts immediately.
+     * @param waitingFunctionIterable A sequence of waiting functions to call.
+     */
+    public static start(waitingFunctionIterable?: Iterable<WaitingFunction>): void {
+        new CallbackQueue(waitingFunctionIterable).start()
+    }
+
+    /**
      * A queue of waiting functions.
      * @private
      */
@@ -40,6 +48,16 @@ export class CallbackQueue {
      * @private
      */
     private readonly callbackNodeSet: Set<CallbackNode> = new Set()
+
+    /**
+     * Creates a callback queue.
+     * @param waitingFunctionIterable some waiting functions.
+     */
+    public constructor(waitingFunctionIterable?: Iterable<WaitingFunction>) {
+        if (waitingFunctionIterable) {
+            this.appendAll(waitingFunctionIterable)
+        }
+    }
 
     /**
      * The callback function to set for callback nodes.

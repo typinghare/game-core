@@ -76,8 +76,8 @@ export class FrameBasedLoopRegistrar {
      */
     public loop(
         framesPerSecond: float,
-        framesPerPeriod: int, callback:
-            FrameBasedLoopCallback,
+        framesPerPeriod: int,
+        callback: FrameBasedLoopCallback,
     ): FrameBasedLoop {
         return this.loopManager.registerLoop(new FrameBasedLoop(framesPerSecond, framesPerPeriod, callback))
     }
@@ -120,7 +120,7 @@ export class FrameBasedLoopRegistrar {
             }
         }
 
-        const loop = new FrameBasedLoop(delayMs, 2, delayCallback)
+        const loop = new FrameBasedLoop(1000 / delayMs, 2, delayCallback)
         return this.loopManager.registerLoop(loop)
     }
 
@@ -128,18 +128,25 @@ export class FrameBasedLoopRegistrar {
      * Registers a frame-based loop that will be deleted after one period.
      * @param framesPerSecond Frames per second.
      * @param framesPerPeriod Number of frames per period.
+     * @param callback
      * @return A callback node to be invoked when the loop ends.
      */
     public onceMethodical(
         framesPerSecond: float,
         framesPerPeriod: int,
+        callback: FrameBasedLoopCallback,
     ): CallbackNode {
         const callbackNode = new CallbackNode()
-        const oneShotCallback = () => {
-            callbackNode.invoke()
+        const oneShotCallback = (frame: int) => {
+            callback(frame)
+            if (frame == framesPerPeriod - 1) {
+                callbackNode.invoke()
+                this.loopManager.deleteLoop(loop)
+            }
         }
 
-        this.once(framesPerSecond, framesPerPeriod, oneShotCallback)
+        const loop = new FrameBasedLoop(framesPerSecond, framesPerPeriod, oneShotCallback)
+        this.loopManager.registerLoop(loop)
         return callbackNode
     }
 
@@ -149,11 +156,15 @@ export class FrameBasedLoopRegistrar {
      */
     public delayMethodical(delayMs: int): CallbackNode {
         const callbackNode = new CallbackNode()
-        const oneShotCallback = () => {
-            callbackNode.invoke()
+        const delayCallback = (frame: int) => {
+            if (frame == 1) {
+                callbackNode.invoke()
+                this.loopManager.deleteLoop(loop)
+            }
         }
 
-        this.delay(delayMs, oneShotCallback)
+        const loop = new FrameBasedLoop(1000 / delayMs, 2, delayCallback)
+        this.loopManager.registerLoop(loop)
         return callbackNode
     }
 }

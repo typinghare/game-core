@@ -10,6 +10,7 @@ export * from './time/FrameBasedLoopManaegr'
 
 // Game
 export * from './game'
+export * from './context'
 
 // Other
 export * from './types'

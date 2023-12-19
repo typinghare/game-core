@@ -1,20 +1,13 @@
 import { float } from './types'
-import { GameEventManager } from './event/GameEventManager'
-import { FrameBasedLoopManager } from './time/FrameBasedLoopManaegr'
 import { Clock } from './time/Clock'
+import { Context, ContextData } from './context'
 
 export class Game {
     /**
-     * Game event manager.
+     * Game context.
      * @private
      */
-    private readonly eventManager = new GameEventManager()
-
-    /**
-     * Frame based Loop manager.
-     * @private
-     */
-    private readonly loopManager = new FrameBasedLoopManager()
+    private readonly context: Context = new Context(this)
 
     /**
      * Creates a game.
@@ -29,22 +22,36 @@ export class Game {
      * Runs the game.
      */
     public run(fps: float = 30) {
-        const clockCallback = (deltaTime: float) => {
-            // Dealing with events
-            while (this.eventManager.handleNext()) {
-                this.eventManager.handleNext()
-            }
+        new Clock((fps: float) => {
+            this.executeFrame(fps)
+        }, fps).run()
+    }
 
-            // Update the loop manager
-            this.loopManager.update(deltaTime)
+    /**
+     * Executes one frame.
+     * @param deltaTime The delta time of the current frame.
+     */
+    public executeFrame(deltaTime: float) {
+        // Dealing with events
+        while (this.context.eventManager.handleNext(this.context)) {
         }
-        const clock = new Clock(clockCallback, fps)
 
-        clock.run()
+        // Update the loop manager
+        this.context.loopManager.update(deltaTime)
+
+        // Invoke the game loop callback
+        this.gameLoopCallback(deltaTime)
+    }
+
+    /**
+     * Returns the game context.
+     */
+    public getContext<D extends ContextData = {}>(): Context<D> {
+        return this.context.be<D>()
     }
 }
 
-export type gameLoopCallback = (fps: float) => float
+export type gameLoopCallback = (fps: float) => float | void
 
 /**
  * Classes implementing this will be updated in every frame.

@@ -1,4 +1,4 @@
-import { ExitCode, GameBeginEvent, GameEndEvent, GameEventManager } from '../src'
+import { ExitCode, Game, GameBeginEvent, GameEndEvent, GameEventManager, Context } from '../src'
 
 describe('Game event test suite', function() {
     it('Create game event', function() {
@@ -14,6 +14,8 @@ describe('Game event test suite', function() {
 })
 
 describe('Game event manager test suite', function() {
+    const context: Context = new Game(() => {}).getContext()
+
     it('Test event queue', function() {
         const gameEventManager = new GameEventManager()
         const gameEvent = new GameBeginEvent()
@@ -34,7 +36,7 @@ describe('Game event manager test suite', function() {
         gameEventManager.trigger(new GameBeginEvent())
 
         // Handle the next event
-        gameEventManager.handleNext()
+        gameEventManager.handleNext(context)
 
         expect(testNumber).toBe(1)
     })
@@ -47,7 +49,7 @@ describe('Game event manager test suite', function() {
         })
 
         gameEventManager.trigger(new GameEndEvent({ exitCode: ExitCode.FAILURE }))
-        gameEventManager.handleNext()
+        gameEventManager.handleNext(context)
 
         expect(testExitCode).toBe(1)
     })

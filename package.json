@@ -1,8 +1,9 @@
 {
   "name": "game-core",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A lightweight game core.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "James Chan",
   "email": "jameschan312.cn@gmail.com",
   "scripts": {

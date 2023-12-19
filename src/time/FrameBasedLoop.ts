@@ -40,7 +40,7 @@ export class FrameBasedLoop implements FrameUpdatable {
         private readonly framesPerPeriod: int,
         private readonly callback: FrameBasedLoopCallback,
     ) {
-        this.msPerFrame = 1 / framesPerSecond
+        this.msPerFrame = 1000 / framesPerSecond
     }
 
     /**
@@ -48,6 +48,10 @@ export class FrameBasedLoop implements FrameUpdatable {
      * @param deltaTime The time elapsed since the last update.
      */
     public update(deltaTime: float) {
+        if (this.paused) {
+            return
+        }
+
         this.elapsedMs += deltaTime
         if (this.elapsedMs < (1 + this.currentFrame) * this.msPerFrame) {
             return
