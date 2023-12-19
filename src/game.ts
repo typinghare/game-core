@@ -1,6 +1,7 @@
 import { float } from './types'
 import { Clock } from './time/Clock'
 import { Context, ContextData } from './context'
+import { GameEndEvent } from './event/events'
 
 export class Game {
     /**
@@ -16,15 +17,27 @@ export class Game {
     public constructor(
         private readonly gameLoopCallback: gameLoopCallback,
     ) {
+        // Set isRunning to false when the Game End event is triggered
+        this.context.eventManager.addHandler(GameEndEvent, function() {
+            this.isRunning = false
+        })
     }
 
     /**
      * Runs the game.
      */
     public run(fps: float = 30) {
-        new Clock((fps: float) => {
-            this.executeFrame(fps)
-        }, fps).run()
+        this.context.isRunning = true
+
+        const clock = new Clock((fps: float) => {
+            if (!this.context.isRunning) {
+                clock.stop()
+            } else {
+                this.executeFrame(fps)
+            }
+        }, fps)
+
+        clock.run()
     }
 
     /**
@@ -51,6 +64,9 @@ export class Game {
     }
 }
 
+/**
+ * Game loop callback.
+ */
 export type gameLoopCallback = (fps: float) => float | void
 
 /**

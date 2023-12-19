@@ -29,6 +29,12 @@ export class Clock {
     private timeoutHandler?: NodeJS.Timeout
 
     /**
+     * Whether this clock has stopped.
+     * @private
+     */
+    private hasStopped: boolean = false
+
+    /**
      * Creates a clock.
      * @param callback The callback function.
      * @param fps Frame per seconds.
@@ -48,8 +54,21 @@ export class Clock {
         this.autoSetTimeoutHandler()
     }
 
+    /**
+     * Stops this clock.
+     */
+    public stop(): void {
+        this.hasStopped = true
+
+        if (this.timeoutHandler) {
+            clearInterval(this.timeoutHandler)
+        }
+    }
+
     private autoSetTimeoutHandler() {
-        this.timeoutHandler = this.getTimeout()
+        if (!this.hasStopped) {
+            this.timeoutHandler = this.getTimeout()
+        }
     }
 
     private getTimeout(delayMs: number = 1000 / this.fps): NodeJS.Timeout {

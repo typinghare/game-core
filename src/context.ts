@@ -13,6 +13,11 @@ export class Context<D extends ContextData = {}> {
     private readonly data: D = {} as D
 
     /**
+     * Whether the game is running.
+     */
+    public isRunning: boolean = false
+
+    /**
      * Game event manager.
      * @private
      */
