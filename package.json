@@ -1,6 +1,6 @@
 {
   "name": "@typinghare/game-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight game core.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
