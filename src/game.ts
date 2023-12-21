@@ -1,7 +1,7 @@
 import { float } from './types'
 import { Clock } from './time/Clock'
 import { Context, ContextData } from './context'
-import { GameEndEvent } from './event/events'
+import { GameBeginEvent, GameEndEvent } from './event/events'
 
 export class Game {
     /**
@@ -28,6 +28,8 @@ export class Game {
      */
     public run(fps: float = 30) {
         this.context.isRunning = true
+
+        this.context.eventManager.trigger(new GameBeginEvent())
 
         const clock = new Clock((fps: float) => {
             if (!this.context.isRunning) {
