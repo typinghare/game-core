@@ -58,7 +58,7 @@ export type GameEventData = {
 export type GameEventClass<
     D extends GameEventData = any,
     T extends GameEvent<D> = GameEvent<D>
-> = new (eventData?: D) => T
+> = new (eventData: Partial<D>) => T
 
 /**
  * Thrown when user wants to get a value from the game event data when it is null.
